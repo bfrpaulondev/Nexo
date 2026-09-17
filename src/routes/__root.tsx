@@ -14,7 +14,8 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0b0c0d" },
       {
         name: "description",
-        content: "Academia interativa de prompt engineering, orquestração de IAs e agentes, com a tutora Íris.",
+        content:
+          "Academia de uso de IAs: nove módulos, nove professores no chat — prompts, agentes, responsabilidade e produtividade.",
       },
     ],
     links: [
@@ -31,7 +32,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: () => (
-    <html lang="pt-BR" className="antialiased" suppressHydrationWarning>
+    <html lang="pt" className="antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

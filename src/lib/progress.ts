@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { LESSONS } from "@/data/course";
+import type { ChatTurn } from "@/data/types";
 
 export type LessonProgress = {
   completed: boolean;
@@ -15,9 +16,13 @@ type Store = {
   name: string;
   setName: (n: string) => void;
   byLesson: Record<string, LessonProgress>;
+  chats: Record<string, ChatTurn[]>;
   mark: (id: string, patch: Partial<LessonProgress>) => void;
+  setChat: (id: string, turns: ChatTurn[]) => void;
   reset: () => void;
 };
+
+const CHAT_CAP = 20;
 
 export const useProgress = create<Store>()(
   persist(
@@ -25,6 +30,7 @@ export const useProgress = create<Store>()(
       name: "",
       setName: (name) => set({ name }),
       byLesson: {},
+      chats: {},
       mark: (id, patch) =>
         set((s) => ({
           byLesson: {
@@ -32,9 +38,13 @@ export const useProgress = create<Store>()(
             [id]: { ...s.byLesson[id], ...patch },
           },
         })),
-      reset: () => set({ byLesson: {}, name: "" }),
+      setChat: (id, turns) =>
+        set((s) => ({
+          chats: { ...s.chats, [id]: turns.slice(-CHAT_CAP) },
+        })),
+      reset: () => set({ byLesson: {}, chats: {}, name: "" }),
     }),
-    { name: "nexo-progress-v1" },
+    { name: "nexo-progress-v3" },
   ),
 );
 

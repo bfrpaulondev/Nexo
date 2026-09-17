@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import type { Faculty } from "@/data/types";
 import { TutorIris, type IrisMood } from "./tutor-iris";
 
-export function TutorSpeech({ lines }: { lines: string[] }) {
+export function TutorSpeech({ lines, faculty }: { lines: string[]; faculty: Faculty }) {
   const [i, setI] = useState(0);
   const [shown, setShown] = useState("");
   const [mood, setMood] = useState<IrisMood>("talk");
+
+  useEffect(() => {
+    setI(0);
+  }, [lines]);
 
   useEffect(() => {
     const full = lines[i] ?? "";
@@ -24,9 +29,11 @@ export function TutorSpeech({ lines }: { lines: string[] }) {
 
   return (
     <div className="flex items-start gap-4 rounded-[var(--radius-lg)] border border-border bg-surface p-4">
-      <TutorIris mood={mood} size={88} />
+      <TutorIris mood={mood} size={88} core={faculty.core} ring={faculty.ring} lamp={faculty.lamp} />
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium uppercase tracking-wide text-subtle">Íris</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-subtle">
+          {faculty.name} · {faculty.model}
+        </p>
         <p className="mt-1 min-h-16 text-[15px] leading-relaxed text-fg">
           {shown}
           {mood === "talk" ? (

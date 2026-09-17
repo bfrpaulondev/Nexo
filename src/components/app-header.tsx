@@ -9,7 +9,7 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/90 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
         <Link to="/" className="font-display text-lg tracking-tight text-fg">
           NEXO
         </Link>

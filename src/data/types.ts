@@ -1,4 +1,13 @@
-export type TrackId = "fundacao" | "prompt" | "rag" | "agentes" | "expert";
+export type TrackId =
+  | "m1"
+  | "m2"
+  | "m3"
+  | "m4"
+  | "m5"
+  | "m6"
+  | "m7"
+  | "m8"
+  | "m9";
 
 export type Section =
   | { type: "text"; title?: string; body: string }
@@ -34,6 +43,22 @@ export type Exercise =
   | { kind: "python"; exercise: PythonExercise }
   | { kind: "reflect"; prompt: string; minChars: number };
 
+export type ChatTurn = { role: "you" | "tutor"; text: string; speaker?: string };
+
+export type Faculty = {
+  id: string;
+  name: string;
+  model: string;
+  role: string;
+  style: string;
+  system: string;
+  starters: string[];
+  temperature: number;
+  core: string;
+  ring: string;
+  lamp: string;
+};
+
 export type Lesson = {
   id: string;
   track: TrackId;
@@ -48,7 +73,9 @@ export type Lesson = {
 
 export type Track = {
   id: TrackId;
+  n: number;
   label: string;
-  level: string;
-  blurb: string;
+  learn: string;
+  practice: string;
+  facultyId: string;
 };

@@ -1,23 +1,43 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BookOpen, MessageSquare, PenLine } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
-import { IrisChat } from "@/components/iris-chat";
+import { AulaChat } from "@/components/aula-chat";
 import { LessonBody } from "@/components/lesson-body";
 import { PromptLab } from "@/components/prompt-lab";
 import { PythonLab } from "@/components/python-lab";
 import { QuizPanel } from "@/components/quiz-panel";
 import { ReflectLab } from "@/components/reflect-lab";
 import { Button } from "@/components/ui/button";
-import { TutorSpeech } from "@/components/tutor-speech";
-import { lessonById, nextLesson, prevLesson, TRACKS } from "@/data/course";
+import {
+  facultyForLesson,
+  lessonById,
+  lessonNotes,
+  nextLesson,
+  practiceBrief,
+  prevLesson,
+  TRACKS,
+} from "@/data/course";
 import { useProgress } from "@/lib/progress";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/aula/$lessonId")({
   component: LessonPage,
 });
 
+type Panel = "aula" | "notas" | "pratica";
+
 function LessonPage() {
   const { lessonId } = Route.useParams();
+  const [panel, setPanel] = useState<Panel>("aula");
+  const mark = useProgress((s) => s.mark);
+  const byLesson = useProgress((s) => s.byLesson);
   const lesson = lessonById(lessonId);
+
+  useEffect(() => {
+    setPanel("aula");
+  }, [lessonId]);
+
   if (!lesson) {
     return (
       <div className="min-h-screen bg-bg px-4 py-16 text-center">
@@ -29,77 +49,102 @@ function LessonPage() {
     );
   }
 
-  const current = lesson;
+  const faculty = facultyForLesson(lesson);
+  const progress = byLesson[lesson.id];
+  const track = TRACKS.find((t) => t.id === lesson.track);
+  const next = nextLesson(lesson.id);
+  const prev = prevLesson(lesson.id);
 
-  const mark = useProgress((s) => s.mark);
-  const progress = useProgress((s) => s.byLesson[current.id]);
-  const track = TRACKS.find((t) => t.id === current.track);
-  const next = nextLesson(current.id);
-  const prev = prevLesson(current.id);
-  const ctx = current.sections
-    .map((s) => {
-      if (s.type === "text") return s.body;
-      if (s.type === "callout") return s.body;
-      return "";
-    })
-    .filter(Boolean)
-    .join("\n")
-    .slice(0, 800);
-
-  function complete() {
-    mark(current.id, { completed: true });
-  }
+  const tabs: { id: Panel; label: string; icon: typeof MessageSquare }[] = [
+    { id: "aula", label: faculty.name, icon: MessageSquare },
+    { id: "notas", label: "Notas", icon: BookOpen },
+    { id: "pratica", label: "Prática", icon: PenLine },
+  ];
 
   return (
-    <div className="min-h-screen bg-bg pb-28">
+    <div className="min-h-screen bg-bg pb-16">
       <AppHeader />
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <p className="text-xs uppercase tracking-wide text-subtle">
-          {track?.label} · aula {current.order}
+          Módulo {track?.n} · {track?.label} · {faculty.name}
         </p>
-        <h1 className="mt-2 text-3xl sm:text-4xl">{current.title}</h1>
-        <p className="mt-2 text-sm text-muted">{current.summary}</p>
+        <h1 className="mt-2 text-3xl sm:text-4xl">{lesson.title}</h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted">{lesson.summary}</p>
 
-        <div className="mt-6">
-          <TutorSpeech lines={current.tutor} />
+        <div className="mt-6 flex gap-1 rounded-[var(--radius-md)] border border-border bg-surface p-1 lg:hidden">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setPanel(t.id)}
+              className={cn(
+                "flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-sm)] text-xs",
+                panel === t.id ? "bg-raised text-fg" : "text-muted",
+              )}
+            >
+              <t.icon className="size-3.5" />
+              {t.label}
+            </button>
+          ))}
         </div>
 
-        <div className="mt-8">
-          <LessonBody sections={current.sections} />
-        </div>
-
-        <section className="mt-10 rounded-[var(--radius-lg)] border border-border bg-surface p-5">
-          <h2 className="text-xl font-medium">Prática</h2>
-          <div className="mt-4">
-            {current.exercise.kind === "quiz" ? (
-              <QuizPanel
-                questions={current.exercise.questions}
-                onComplete={(score, total) => {
-                  mark(current.id, { quizScore: score, quizTotal: total, completed: true });
-                }}
-              />
-            ) : null}
-            {current.exercise.kind === "prompt" ? (
-              <PromptLab
-                exercise={current.exercise.exercise}
-                onComplete={(score) => mark(current.id, { promptScore: score, completed: true })}
-              />
-            ) : null}
-            {current.exercise.kind === "python" ? (
-              <PythonLab
-                exercise={current.exercise.exercise}
-                onComplete={() => mark(current.id, { pythonOk: true, completed: true })}
-              />
-            ) : null}
-            {current.exercise.kind === "reflect" ? (
-              <ReflectLab
-                prompt={current.exercise.prompt}
-                minChars={current.exercise.minChars}
-                onComplete={(text) => mark(current.id, { reflection: text, completed: true })}
-              />
-            ) : null}
+        <div className="mt-6 flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className={cn(panel !== "aula" && "max-lg:hidden")}>
+            <AulaChat
+              key={lesson.id}
+              lessonId={lesson.id}
+              lessonTitle={lesson.title}
+              notes={lessonNotes(lesson)}
+              practice={practiceBrief(lesson.exercise)}
+              faculty={faculty}
+              opening={lesson.tutor}
+              allowConsult={lesson.track === "m9"}
+            />
           </div>
-        </section>
+          <div className="space-y-8">
+            <div className={cn(panel !== "notas" && "max-lg:hidden")}>
+              <LessonBody sections={lesson.sections} />
+            </div>
+            <section
+              className={cn(
+                "rounded-[var(--radius-lg)] border border-border bg-surface p-5",
+                panel !== "pratica" && "max-lg:hidden",
+              )}
+            >
+              <h2 className="text-xl font-medium">Prática</h2>
+              <p className="mt-1 text-sm text-muted">{track?.practice}</p>
+              <div className="mt-4">
+                {lesson.exercise.kind === "quiz" ? (
+                  <QuizPanel
+                    questions={lesson.exercise.questions}
+                    onComplete={(score, total) => {
+                      mark(lesson.id, { quizScore: score, quizTotal: total, completed: true });
+                    }}
+                  />
+                ) : null}
+                {lesson.exercise.kind === "prompt" ? (
+                  <PromptLab
+                    exercise={lesson.exercise.exercise}
+                    onComplete={(score) => mark(lesson.id, { promptScore: score, completed: true })}
+                  />
+                ) : null}
+                {lesson.exercise.kind === "python" ? (
+                  <PythonLab
+                    exercise={lesson.exercise.exercise}
+                    onComplete={() => mark(lesson.id, { pythonOk: true, completed: true })}
+                  />
+                ) : null}
+                {lesson.exercise.kind === "reflect" ? (
+                  <ReflectLab
+                    prompt={lesson.exercise.prompt}
+                    minChars={lesson.exercise.minChars}
+                    onComplete={(text) => mark(lesson.id, { reflection: text, completed: true })}
+                  />
+                ) : null}
+              </div>
+            </section>
+          </div>
+        </div>
 
         <nav className="mt-8 flex flex-wrap items-center justify-between gap-3">
           {prev ? (
@@ -113,7 +158,7 @@ function LessonPage() {
           )}
           <div className="flex flex-wrap gap-2">
             {!progress?.completed ? (
-              <Button variant="ghost" onClick={complete}>
+              <Button variant="ghost" onClick={() => mark(lesson.id, { completed: true })}>
                 Marcar como lida
               </Button>
             ) : null}
@@ -131,7 +176,6 @@ function LessonPage() {
           </div>
         </nav>
       </main>
-      <IrisChat lessonTitle={current.title} context={ctx} />
     </div>
   );
 }
