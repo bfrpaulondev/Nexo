@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "NEXO",
+      "hasCanvas": false,
+      "bodyTextLen": 1204,
+      "bodyTextHash": "38d0fcd59f89000832234899ed30800f359daa4ba2769ba738d8f17821d42ddc",
+      "bodyTextPrefix": "NEXO 0/19 aulas ACADEMIA NEXO Curso interativo do básico ao expe",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "NEXO",
+      "hasCanvas": false,
+      "bodyTextLen": 1193,
+      "bodyTextHash": "03d095dbd87a20028f8ad1750f1620492312a68c30f3391d4b3425fb65229800",
+      "bodyTextPrefix": "NEXO ACADEMIA NEXO Curso interativo do básico ao expert: prompts",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

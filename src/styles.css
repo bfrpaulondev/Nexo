@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0b0c0d;
+  --color-surface: #141516;
+  --color-raised: #1c1d1f;
+  --color-fg: #eceae4;
+  --color-muted: #8e8c86;
+  --color-subtle: #6a6863;
+  --color-accent: #9eb3c4;
+  --color-accent-fg: #0b0c0d;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+  --color-ring: color-mix(in oklab, var(--color-accent) 70%, white);
+  --color-ok: #6b8f71;
+  --color-warn: #c4a574;
+  --color-danger: #c47a74;
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 35%, transparent);
+    color: var(--color-fg);
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+  }
+}
+
+@keyframes iris-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes iris-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes iris-talk {
+  0%,
+  100% {
+    d: path("M38 62 Q50 66 62 62");
+  }
+  50% {
+    d: path("M38 62 Q50 72 62 62");
+  }
+}
+
+@keyframes iris-think {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes type-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.iris-float {
+  animation: iris-float 4.2s var(--ease-smooth-out) infinite;
+}
+
+.iris-eye {
+  transform-origin: center;
+  animation: iris-blink 5.4s linear infinite;
+}
+
+.iris-mouth-talk {
+  animation: iris-talk 0.32s ease-in-out infinite;
+}
+
+.iris-ring-think {
+  animation: iris-think 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iris-float,
+  .iris-eye,
+  .iris-mouth-talk,
+  .iris-ring-think {
+    animation: none;
+  }
+}
